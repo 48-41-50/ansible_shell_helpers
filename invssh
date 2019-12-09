@@ -1,0 +1,26 @@
+#! /usr/bin/env bash
+
+INV_IP=$(which inv_ip)
+
+if [[ -z "${INV_IP}" ]]
+then
+	echo "The script 'inv_ip' is not in your path. Please check the installation and your executable path." 1>&2
+	exit -1
+fi
+
+ENV=${1}
+TARGET=${2}
+
+IP_TARGET=$(${INV_IP} ${ENV} ${TARGET})
+
+if [[ "1" != $(wc -l <<<"${IP_TARGET}") ]]
+then
+	echo "Found multiple targets for the ${ENV} inventory targeting \"${TARGET}\"." 1>&2
+	echo "Results:" 1>&2
+	echo "${IP_TARGET}" 1>&2
+	exit -2
+fi
+
+ssh ${IP_TARGET} $@
+
+exit $?

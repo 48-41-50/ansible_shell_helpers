@@ -1,0 +1,26 @@
+#! /usr/bin/env bash
+
+if [[ -z "${ANSIBLE_ROOT}" ]]
+then
+    echo "Set the environment variable ANSIBLE_ROOT to the path to your ansible root (direcvtory above 'inventories')" 1>&2
+    exit -1
+fi
+
+INVENTORY_ROOT="${ANSIBLE_ROOT}"/inventories
+
+[[ $# -ne 2 ]] && echo "Usage: ${0##*/} <env> <target>" && exit 255
+
+INV_FILE=$(ls -1 "${INVENTORY_ROOT}/${1}"* | head -1)
+TARGET="${2}"
+RC=0
+
+if [[ -s "${INV_FILE}" ]]
+then
+    grep -E "short.*?${TARGET}" "${INV_FILE}" | cut -d ' ' -f 1
+    RC=$?
+else
+    echo "No file found \"${INV_FILE}\"." 1>&2
+    RC=2
+fi
+
+exit ${RC}
