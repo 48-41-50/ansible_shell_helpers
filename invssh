@@ -8,8 +8,26 @@ then
 	exit -1
 fi
 
+USER=""
+
+# Get optional user argument
+while getopts ":u:" opt
+do
+	case ${opt} in
+		u ) USER="${OPTARG}@"
+		    ;;
+		\?) echo "Invalid option \"${OPTARG}\"."
+		    exit -1
+		    ;;
+	esac
+done
+shift $((OPTIND - 1))
+
+# Get required environment and target args
 ENV=${1}
-TARGET=${2}
+shift
+TARGET=${1}
+shift
 
 IP_TARGET=$(${INV_IP} ${ENV} ${TARGET})
 
@@ -21,6 +39,6 @@ then
 	exit -2
 fi
 
-ssh ${IP_TARGET} $@
+ssh ${USER}${IP_TARGET} $@
 
 exit $?
